@@ -22,8 +22,8 @@
 # ----------------------------------------------------------------
 function locate_file(index)
     id = index - 1
-    dir = string(id % 100)
-    joinpath(dir, "sec$(id).dat")
+    dir = lpad(string(id % 100), 2, '0')
+    joinpath(dir, "sec$(lpad(string(id), 5, '0')).dat")
 end
 
 function make_data_directories(folder)
@@ -83,7 +83,7 @@ using SharedArrays
     (nstates, nattrs) = size(dest)[1:2]
     open(filename) do io
         nbytes = nstates * nattrs * 8
-        buffer = read(io, nbytes)
+        buffer = read(io, nbytes) # Vector{UInt8} (alias for Array{UInt8, 1}) 
         A = reinterpret(Float64, buffer)
         dest[:, :, index] = A
     end
@@ -92,8 +92,8 @@ end
 # obtain path to data file
 @everywhere function locate_file(index)
     id = index - 1
-    dir = string(id % 100)
-    joinpath(dir, "sec$(id).dat")
+    dir = lpad(string(id % 100), 2, '0')
+    joinpath(dir, "sec$(lpad(string(id), 5, '0')).dat")
 end
 
 # main program
@@ -108,13 +108,12 @@ end
 nfiles  = 100_000;
 nstates = 10_000;
 nattr   = 3;
-valuation = SharedArray{Float64}(nstates, nattr, nfiles);
+valuation = SharedArray{Float64}(nstates, nattr, nfiles); # 三维数组
 
 @time load_data!(nfiles, valuation);
-
 # It took about 3 minutes to load data 100,000 files
-#=
-julia> @time load_data!(nfiles, valuation);
+#= @time load_data!(nfiles, valuation);
 180.975685 seconds (1.49 M allocations: 76.647 MiB, 0.01% gc time)
+实际:!  98.520553 seconds (1.15 M allocations: 57.193 MiB, 0.01% gc time, 0.64% compilation time)
 =#
 

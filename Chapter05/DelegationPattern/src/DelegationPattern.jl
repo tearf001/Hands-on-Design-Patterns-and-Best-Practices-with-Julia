@@ -11,6 +11,8 @@ export interest_rate, accrue_daily_interest!
 
 # package dependencies
 using Dates: Date
+using Pkg
+Pkg.add("Lazy")
 using Lazy: @forward
 
 include("Account.jl")

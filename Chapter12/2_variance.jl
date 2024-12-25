@@ -36,7 +36,12 @@ julia> adopt(Dog("Clifford"))
 "Dog Clifford is now adopted."
 =#
 
-adopt(Crocodile("Solomon"));
+try
+    adopt(Crocodile("Solomon"));    
+catch e
+    println("错误, 鳄鱼无法被领养")
+    e |> println
+end
 #=
 julia> adopt(Crocodile("Solomon"))
 ERROR: MethodError: no method matching adopt(::Crocodile)
@@ -45,9 +50,15 @@ Closest candidates are:
 =#
 
 # Covariant?  Does Cat <: Mammal imply Array{Cat} <: Array{Mammal}?
-adopt(ms::Array{Mammal,1}) = "adopted " * string(ms)
+adopt(ms::Array{Mammal,1}, at=@__LINE__) = println("领养 " * string(ms), (at == @__LINE__) ? "" : at)
 
-adopt([Cat("Felix"), Cat("Garfield")])
+try
+    adopt([Dog("Felix"), Cat("Garfield")], @__LINE__)   # 通过 Array{Mammal}
+    adopt([Cat("Felix"), Cat("Garfield")], @__LINE__)   #! 不通过 Array{Cat}
+catch e
+    println("错误, 参数化类型是不变的")
+    e |> println
+end
 #=
 julia> adopt([Cat("Felix"), Cat("Garfield")])
 ERROR: MethodError: no method matching adopt(::Array{Cat,1})
@@ -56,7 +67,7 @@ Closest candidates are:
   adopt(::Mammal) at REPL[33]:3
 =#
 
-adopt(Mammal[Cat("Felix"), Cat("Garfield")])
+adopt(Mammal[Cat("Felix"), Cat("Garfield")]) 
 #=
 julia> adopt(Mammal[Cat("Felix"), Cat("Garfield")])
 "adopted Mammal[Cat Felix, Cat Garfield]"
@@ -75,11 +86,16 @@ julia> adopt([Cat("Felix"), Dog("Clifford")])
 # Mammal isn't concrete.  
 
 # What we should have done?
-
+Number;
 # homongeneous array of objects with the same concrete type
 function adopt(ms::Array{T,1}) where {T <: Mammal}
-    return "accepted same kind:" * string(ms)
+    return "accepted same kind, 泛型领养:" * string(ms) |> println
 end
+adopt2(ms::Array{T,1}) where {T <: Mammal} = "accepted same kind, 泛型领养:" * string(ms) |> println
+adopt2(ms::Array{T,1}) where {T <: Mammal} = begin
+   "accepted same kind, 泛型领养:" * string(ms) |> println 
+end
+
 #=
 julia> methods(adopt)
 # 3 methods for generic function "adopt":
@@ -88,9 +104,9 @@ julia> methods(adopt)
 [3] adopt(ms::Array{T,1}) where T<:Mammal in Main at REPL[26]:1
 =#
 
-adopt([Cat("Felix"), Cat("Garfield")])
-adopt([Dog("Clifford"), Dog("Astro")])
-adopt([Cat("Felix"), Dog("Clifford")])
+adopt([Cat("Felix"), Cat("Garfield")]) # 泛型领养 Array{T,1}) where {T <: Mammal}
+adopt([Dog("Clifford"), Dog("Astro")]) # 泛型领养 Array{T,1}) where {T <: Mammal}
+adopt([Cat("Felix"), Dog("Clifford")]) # 非泛型领养 Array{Mammal,1}
 
 #=
 julia> adopt([Cat("Felix"), Cat("Garfield")])
@@ -240,14 +256,15 @@ function meet_partner(finder::Function, self::Mammal)
     kiss(partner)
 end
 
-meet_partner(match, Cat("Felix"))
+meet_partner(match, Cat("Felix")) # 协变测试
+meet_partner(match, Dog("Alex")) # 协变测试
 #=
 julia> meet_partner(match, Cat("Felix"))
 "Cat Kittie kissed!"
 =#
 
 # How about Mammal -> Vertebrate?
-neighbor(m::Mammal) = Crocodile("Solomon")
+neighbor(m::Mammal) = Crocodile("Solomon") # 协变测试的反例
 
 meet_partner(neighbor, Cat("Felix"))
 #=
@@ -274,6 +291,8 @@ julia> meet_partner(buddy, Cat("Felix"))
 julia> meet_partner(buddy, Dog("Chef"))
 ERROR: MethodError: no method matching buddy(::Dog)
 =#
+
+contra_test(v::Vertebrate) = rand(union(female_cats, female_dogs))
 
 # "Be liberal in what you accept and conservative in what you produce."
 

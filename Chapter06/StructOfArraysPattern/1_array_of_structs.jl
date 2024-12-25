@@ -19,7 +19,7 @@ end
 
 # Use CVS.jl to parse the file into a vecot or TripPayment objects
 function read_trip_payment_file(file)
-    f = CSV.File(file, datarow = 3)
+    f = CSV.File(file, skipto = 2)
     records = Vector{TripPayment}(undef, length(f))
     for (i, row) in enumerate(f)
         records[i] = TripPayment(row.VendorID,
@@ -66,6 +66,8 @@ julia> @btime mean(r.fare_amount for r in $records);
 # what if we have the fare_amount data in an array?
 fare_amounts = [r.fare_amount for r in records];
 
+@btime mean($fare_amounts) # 12.200 μs (0 allocations: 0 bytes)
+@btime mean(fare_amounts) # 27.090 μs (1 allocation: 16 bytes)
 #=
 julia> @btime mean(fare_amounts)
   27.090 μs (1 allocation: 16 bytes)
@@ -76,3 +78,14 @@ julia> @btime mean(fare_amounts)
 julia> 640 / 27
 23.703703703703702
 =#
+error()
+
+function generate_test_data(nfiles)
+	for i in 1:nfiles
+		A=rand(10000,3)
+		file=locate_file(i)
+		open(file,"w") do io
+			write(io,A)
+		end
+	end
+end

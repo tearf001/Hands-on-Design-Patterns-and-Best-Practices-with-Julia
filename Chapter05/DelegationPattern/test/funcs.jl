@@ -23,15 +23,15 @@ end
 
 # SavingsAccount (parent object - manual forwarding)
 function test_savings_account()
-    acct = SavingsAccount("1234", 3000.00, Date(2019, 3, 1), 0.03)
-    acct2 = SavingsAccount("5678", 1000.00, Date(2018, 3, 1), 0.03)
+    acct = SavingsAccount("1234", 3000.00, Date(2019, 3, 1), interest_rate=0.03)
+    acct2 = SavingsAccount("5678", 1000.00, Date(2018, 3, 1), interest_rate=0.03)
     test_savings_account_logic(acct, acct2)
 end
 
 # SavingsAccount2 (parent object - using @forward)
 function test_savings_account2()
-    acct = SavingsAccount2("1234", 3000.00, Date(2019, 3, 1), 0.03)
-    acct2 = SavingsAccount2("5678", 1000.00, Date(2018, 3, 1), 0.03)
+    acct = SavingsAccount2("1234", 3000.00, Date(2019, 3, 1), interest_rate=0.03)
+    acct2 = SavingsAccount2("5678", 1000.00, Date(2018, 3, 1), interest_rate=0.03)
     test_savings_account_logic(acct, acct2)
 end
 

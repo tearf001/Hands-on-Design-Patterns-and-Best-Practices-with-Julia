@@ -6,8 +6,13 @@ struct SavingsAccount2
     acct::Account
     interest_rate::Float64
     
-    SavingsAccount2(account_number, balance, date_opened, interest_rate) = new(
+    SavingsAccount2(account_number, balance, date_opened; interest_rate) = new(
         Account(account_number, balance, date_opened),
+        interest_rate
+    )
+
+    SavingsAccount2(acct:: Account; interest_rate) = new(
+        acct,
         interest_rate
     )
 end
@@ -29,3 +34,9 @@ function accrue_daily_interest!(sa::SavingsAccount2)
     deposit!(sa.acct, interest)
 end
 
+Base.@_inline_meta
+using OffsetArrays;
+
+UnionAll: Base.DenseArray, Array;
+using AbstractPlotting
+BitArray, AbstractPlotting.Volume

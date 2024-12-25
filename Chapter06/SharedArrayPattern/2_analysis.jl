@@ -39,7 +39,8 @@ julia> result[1:5, :]
 =#
 
 # performance check: ~5s
-
+using BenchmarkTools
+BenchmarkTools.@btime,@time
 @benchmark std_by_security($valuation) seconds=30
 #=
 julia> @benchmark std_by_security($valuation) seconds=30
@@ -54,8 +55,17 @@ BenchmarkTools.Trial:
   --------------
   samples:          6
   evals/sample:     1
-=#
+-------------------------新版---------------------  
+BenchmarkTools.Trial: 7 samples with 1 evaluation.
+ Range (min … max):  4.462 s …    4.818 s  ┊ GC (min … max): 12.84% … 13.21%
+ Time  (median):     4.596 s               ┊ GC (median):    13.28%
+ Time  (mean ± σ):   4.616 s ± 115.322 ms  ┊ GC (mean ± σ):  13.24% ±  0.51%
 
+  █            █ █     █      █        █                   █  
+  █▁▁▁▁▁▁▁▁▁▁█▁█▁▁▁▁█▁▁▁▁▁█▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
+  4.46 s         Histogram: frequency by time         4.82 s <
+ Memory estimate: 22.37 GiB, allocs estimate: 900003.
+=#
 
 # Let's try the distributed way.
 
@@ -98,6 +108,15 @@ BenchmarkTools.Trial:
   --------------
   samples:          33
   evals/sample:     1
+  -------------------新版-------------
+  BenchmarkTools.Trial: 11 samples with 1 evaluation.
+ Range (min … max):  2.885 s …   3.119 s  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     2.947 s              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   2.964 s ± 64.141 ms  ┊ GC (mean ± σ):  0.00% ± 0.00%
+
+  ▁        █ 
+  █▁▁▁▁▁▁▁█▁█▁▁▁██▁█▁▁█▁▁▁▁█▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
+  2.88 s         Histogram: frequency by time                3.12 s <
 =#
 
 # how much faster?
@@ -106,3 +125,18 @@ julia> 4983 / 880
 5.6625
 =#
 
+rand(2)
+using Memoize: memoize
+@memoize
+using Distributed: @sync
+repeat
+propertynames;similar;
+eachindex;
+@isdefined
+function heatmap!(s::Simulation{N},new_heatmap::AbstractArray{Float64,N}) where {N}
+	length(unique(size(new_heatmap)))==1 ||	error("dimensions must have same size")
+	s.heatmap=new_heatmap
+	s.stats=(mean =mean(new_heatmap),std=std(new_heatmap))
+	return nothing
+end
+eachindex;objectid;ntuple

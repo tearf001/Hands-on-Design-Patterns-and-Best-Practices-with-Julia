@@ -111,4 +111,8 @@ hotness(score) = score > 100 ? Val(:high) : Val(:low)
 celebrate(v::Val{:high}) = logx("Woohoo! Lots of hot topics!")(v)
 celebrate(v::Val{:low}) = logx("It's just a normal day...")(v)
 
+celebrate(v::Val{:high}) = logx("Woohoo! Lots of hot topics! {}", reverse ∘ string)(v)
+celebrate(v::Val{:low}) = logx("It's just a normal day!{}", uppercase ∘ string)(v)
+
+
 end # module

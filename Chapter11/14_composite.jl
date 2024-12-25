@@ -70,8 +70,8 @@ market_value(s::Holding) = s.qty * s.price
 market_value(p::Portfolio) = 
     mapreduce(market_value, +, p.stocks, init = 0.0) +
     mapreduce(market_value, +, p.subportfolios, init = 0.0)
-    # length(p.stocks) > 0 ? sum(market_value.(p.stocks)) : 0.0 + 
-    # length(p.subportfolios) > 0 ? sum(market_value.(p.subportfolios)) : 0.0
+
+market_value2(p::Portfolio,:new) =  sum(market_value.(p.stocks)) + sum(market_value2.(p.subportfolios), init=0)
 
 # Every investment should have a trade symbols regarless of whether 
 # it is a portfolio or stock.

@@ -4,7 +4,7 @@ abstract type Vehicle end
 
 struct Car <: Vehicle end
 
-move(v::Vehicle) = "$v has moved.";
+move(v::Vehicle) = "$v has moved." |> println;
 
 car = Car();
 move(car)
@@ -17,7 +17,7 @@ julia> move(helicopter)
 
 abstract type FlyingVehicle <: Vehicle end
 
-liftoff(v::FlyingVehicle) = "$v has lifted off.";
+liftoff(v::FlyingVehicle) = "$v has lifted off." |> println;
 
 struct Helicopter <: FlyingVehicle end
 
@@ -34,7 +34,7 @@ julia> liftoff(helicopter)
 
 # Method overrides
 
-liftoff(h::Helicopter) = "$h has lifted off vertically.";
+liftoff(h::Helicopter) = "$h has lifted off vertically." |> println;
 
 liftoff(helicopter)
 #=
@@ -50,7 +50,7 @@ abstract type Animal end
 
 struct Horse <: Animal end
 
-move(h::Horse) = "$h running fast.";
+move(h::Horse) = "$h running fast." |> println;
 
 horse = Horse();
 move(horse)

@@ -3,10 +3,12 @@
 We will use Delegation pattern to gain existing `Account` functionality.
 """
 struct SavingsAccount
+    # composite
     acct::Account
+    # extends
     interest_rate::Float64
     
-    SavingsAccount(account_number, balance, date_opened, interest_rate) = new(
+    SavingsAccount(account_number, balance, date_opened; interest_rate) = new(
         Account(account_number, balance, date_opened),
         interest_rate
     )
